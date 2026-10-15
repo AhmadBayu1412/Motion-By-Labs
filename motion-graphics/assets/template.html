@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Motion template</title>
+<!--
+  Deterministic motion page. Everything is a pure function of time t: renderAt(t) sets every style from t.
+  No CSS transitions, no requestAnimationFrame state, no Math.random() (use hash()). Then render.mjs can sample any
+  instant, add motion blur, render ranges in parallel, and re-render one segment to splice.
+
+  Copy next to fonts/ (from the skill's assets/fonts), then:
+    node <skill>/scripts/render.mjs --page film.html --name film --stills 0.5,2,4     # check frames
+    node <skill>/scripts/render.mjs --page film.html --name film --sound film_sound.py --sub 3
+  Open the page in a browser (any static server) to preview live: it loops in real time without ?capture.
+-->
+<style>
+@font-face{font-family:"Geist";src:url(fonts/Geist-normal.woff2) format("woff2");font-weight:100 900;font-display:block}
+@font-face{font-family:"Geist Mono";src:url(fonts/GeistMono-normal.woff2) format("woff2");font-weight:100 900;font-display:block}
+@font-face{font-family:"Instrument Serif";src:url(fonts/InstrumentSerif-italic.woff2) format("woff2");font-style:italic;font-display:block}
+/* one palette, defined once. Keep ONE accent; everything else is ink/paper/greys */
+:root{--bg:#F4F4F2;--ink:#0E0F12;--mut:#8C8C88;--acc:#2E5BFF;--card:#fff}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#000;overflow:hidden}
+#stage{position:relative;width:1920px;height:1080px;overflow:hidden;background:var(--bg);color:var(--ink);font-family:"Geist",sans-serif;-webkit-font-smoothing:antialiased}
+#world{position:absolute;inset:0;transform-origin:960px 540px}          /* camera: punches/drift apply here */
+.L{position:absolute;inset:0;display:none}                                /* one layer per scene */
+.mono{font-family:"Geist Mono",monospace;letter-spacing:.14em;text-transform:uppercase}
+.h1{position:absolute;left:0;width:1920px;text-align:center;font-weight:800;letter-spacing:-.045em;line-height:1}
+.w{display:inline-block;margin:0 .12em}                                   /* word span: keep the margin or words glue together */
+.acc{color:var(--acc)}
+.card{position:absolute;background:var(--card);border-radius:24px;border:1px solid #0000000d;box-shadow:0 18px 44px #0000001a}
+</style>
+</head>
+<body>
+<div id="stage">
+ <div id="world">
+  <div class="L" id="S1"><div class="h1" id="t1" style="top:430px;font-size:150px"></div></div>
+  <div class="L" id="S2"><div class="card" id="c2" style="left:560px;top:290px;width:800px;height:500px"></div>
+   <div class="h1" id="t2" style="top:840px;font-size:64px"></div></div>
+  <div class="L" id="S3"><div class="h1" id="t3" style="top:440px;font-size:180px"></div>
+   <div class="mono" id="t3s" style="position:absolute;left:0;width:1920px;text-align:center;top:660px;font-size:22px;color:var(--mut)">example.com</div></div>
+ </div>
+</div>
+
+<script type="module">
+const DURATION = 6;
+const $ = id => document.getElementById(id);
+
+// ---------------------------------------------------------------- time helpers
+const cl = x => Math.max(0, Math.min(1, x));
+const seg = (t, a, b) => cl((t - a) / (b - a));                    // 0→1 progress of t across [a,b]
+const mix = (a, b, p) => a + (b - a) * p;
+const ex = p => p >= 1 ? 1 : 1 - Math.pow(2, -10 * p);             // expo-out: snaps in then glides (default)
+const exin = p => p <= 0 ? 0 : Math.pow(2, 10 * p - 10);            // expo-in: for exits / falls
+const exio = p => p <= 0 ? 0 : p >= 1 ? 1 : p < .5 ? Math.pow(2, 20 * p - 10) / 2 : (2 - Math.pow(2, -20 * p + 10)) / 2;
+const spring = p => p <= 0 ? 0 : p >= 1 ? 1 : 1 - Math.exp(-6 * p) * Math.cos(11 * p);   // ~15% overshoot, settles fast
+const q = (t, f = 12) => Math.floor(t * f + 1e-6) / f;              // stepped time → stop-motion pixels / digital feel
+const hash = n => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };   // deterministic "random"
+const show = (id, on) => { const e = $(id), d = on ? "block" : "none"; if (e.style.display !== d) e.style.display = d; return on; };
+const Lay = (id, a, b, t) => show(id, t >= a && t < b);             // scene window; overlap windows ~0.1–0.3 s for morphs
+
+// words reveal: build once, then per-word slide-up + unblur, staggered (0.055–0.085 s/word reads fast but legible)
+// a word prefixed with * gets the accent colour: words(el, "jadi *gerak.")
+function words(el, text) { el.innerHTML = text.split(" ").map(w => w.startsWith("*") ? `<span class="w acc">${w.slice(1)}</span>` : `<span class="w">${w}</span>`).join(""); return [...el.children]; }
+function reveal(ws, t, t0, step = .07, out = 1e9) { const o = ex(seg(t, out, out + .3));
+  ws.forEach((w, i) => { const k = ex(seg(t, t0 + i * step, t0 + i * step + .45)); w.style.opacity = cl(k * 1.4) * (1 - o);
+    w.style.transform = `translateY(${(1 - k) * 40 - o * 30}px)`; w.style.filter = `blur(${(1 - k) * 12 + o * 14}px)`; }); }
+
+// camera punches: [time, amount]. Scale bump + decaying shake on every hard hit (sync a kick in the sound script)
+const PUNCH = [[1.9, .04], [4.0, .03]];
+function cam(t) { let s = 1, x = 0, y = 0; PUNCH.forEach(([p, a], j) => { if (t < p) return; const d = t - p; s += a * Math.exp(-d * 7);
+  x += Math.sin(d * 63 + j) * 14 * a / .03 * Math.exp(-d * 10); y += Math.cos(d * 57 + j * 2) * 10 * a / .03 * Math.exp(-d * 10); }); return { s, x, y }; }
+
+// ---------------------------------------------------------------- scenes
+let W1, W2, W3;
+function renderAt(t) {
+  if (Lay("S1", 0, 2.1, t)) { reveal(W1, t, .15, .08, 1.75); }
+  if (Lay("S2", 1.85, 4.1, t)) { const k = spring(seg(t, 1.9, 2.4)), o = exin(seg(t, 3.8, 4.1));
+    $("c2").style.transform = `translateY(${(1 - k) * 300 - o * 900}px) rotate(${(1 - k) * -6}deg) scale(${.8 + .2 * k})`; reveal(W2, t, 2.3, .07, 3.7); }
+  if (Lay("S3", 3.95, DURATION, t)) { reveal(W3, t, 4.0, .09); $("t3s").style.opacity = seg(t, 4.6, 4.9); }
+  const c = cam(t); $("world").style.transform = `translate(${c.x}px,${c.y}px) scale(${c.s})`;
+}
+
+window.DURATION = DURATION;
+window.renderAt = renderAt;
+window.reelReady = (async () => {
+  await document.fonts.load('800 100px "Geist"'); await document.fonts.load('500 20px "Geist Mono"'); await document.fonts.ready;
+  W1 = words($("t1"), "Satu ide."); W2 = words($("t2"), "jadi *gerak."); W3 = words($("t3"), "*Brand.");
+  renderAt(0); return true;
+})();
+if (!location.search.includes("capture")) { await window.reelReady; const t0 = performance.now(); const loop = () => { renderAt(((performance.now() - t0) / 1000) % DURATION); requestAnimationFrame(loop); }; loop(); }
+</script>
+</body>
+</html>
