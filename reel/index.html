@@ -1,0 +1,1225 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Motion Designer Showreel — 15s Portfolio</title>
+<style>
+@font-face {
+  font-family: "Syne";
+  src: url("fonts/Syne-normal.woff2") format("woff2");
+  font-weight: 700 800;
+  font-display: block;
+}
+@font-face {
+  font-family: "Geist";
+  src: url("fonts/Geist-normal.woff2") format("woff2");
+  font-weight: 300 900;
+  font-display: block;
+}
+@font-face {
+  font-family: "Geist Mono";
+  src: url("fonts/GeistMono-normal.woff2") format("woff2");
+  font-weight: 400 800;
+  font-display: block;
+}
+@font-face {
+  font-family: "Instrument Serif";
+  src: url("fonts/InstrumentSerif-italic.woff2") format("woff2");
+  font-style: italic;
+  font-display: block;
+}
+@font-face {
+  font-family: "Instrument Serif Regular";
+  src: url("fonts/InstrumentSerif-normal.woff2") format("woff2");
+  font-display: block;
+}
+
+:root {
+  --bg: #06070B;
+  --bg-card: rgba(13, 16, 26, 0.78);
+  --fg: #F1F4FA;
+  --fg-dim: #9297AA;
+  --fg-muted: #51566C;
+  --cyan: #00F0FF;
+  --cyan-glow: rgba(0, 240, 255, 0.5);
+  --blue: #2563EB;
+  --lime: #D4E751;
+  --card-border: rgba(255, 255, 255, 0.1);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  background: #000;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+}
+
+#stage {
+  position: relative;
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: "Geist", -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  perspective: 1200px;
+}
+
+/* Ambient dynamic backdrops */
+#bg-ambient {
+  position: absolute;
+  inset: -120px;
+  pointer-events: none;
+  background:
+    radial-gradient(circle 950px at 25% 25%, rgba(37, 99, 235, 0.22), transparent 70%),
+    radial-gradient(circle 850px at 75% 75%, rgba(0, 240, 255, 0.16), transparent 70%),
+    radial-gradient(circle 650px at 50% 50%, rgba(212, 231, 81, 0.08), transparent 75%);
+}
+
+#bg-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 80px 80px;
+  background-position: center center;
+}
+
+/* Studio UI Overlay & Telemetry */
+#studio-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 100;
+}
+
+.crop-corner {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  border-color: rgba(255, 255, 255, 0.35);
+  border-style: solid;
+}
+.crop-tl { top: 40px; left: 40px; border-width: 2px 0 0 2px; }
+.crop-tr { top: 40px; right: 40px; border-width: 2px 2px 0 0; }
+.crop-bl { bottom: 40px; left: 40px; border-width: 0 0 2px 2px; }
+.crop-br { bottom: 40px; right: 40px; border-width: 0 2px 2px 0; }
+
+.telemetry-badge {
+  position: absolute;
+  font-family: "Geist Mono", monospace;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  color: var(--fg-muted);
+  text-transform: uppercase;
+}
+#tc-top-left { top: 44px; left: 84px; }
+#tc-top-right { top: 44px; right: 84px; text-align: right; }
+#tc-bot-left { bottom: 44px; left: 84px; }
+#tc-bot-right { bottom: 44px; right: 84px; text-align: right; }
+
+.badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+}
+.badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--cyan);
+  box-shadow: 0 0 8px var(--cyan);
+}
+
+/* Master Camera Wrapper */
+#world {
+  position: absolute;
+  inset: 0;
+  transform-origin: 960px 540px;
+  will-change: transform;
+}
+
+/* Common Layers & Utilities */
+.L {
+  position: absolute;
+  inset: 0;
+  display: none;
+}
+.mono {
+  font-family: "Geist Mono", monospace;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.serif-italic {
+  font-family: "Instrument Serif", serif;
+  font-style: italic;
+}
+.syne {
+  font-family: "Syne", sans-serif;
+  font-weight: 800;
+}
+.cyan { color: var(--cyan); }
+.cyan-glow { text-shadow: 0 0 35px var(--cyan-glow); }
+.lime { color: var(--lime); }
+.lime-glow { text-shadow: 0 0 35px rgba(212, 231, 81, 0.45); }
+.w {
+  display: inline-block;
+  margin: 0 0.16em;
+  will-change: transform, opacity, filter;
+}
+
+/* Scanlines overlay */
+#scanlines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.018) 0px,
+    rgba(255, 255, 255, 0.018) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  z-index: 99;
+}
+
+/* =================================================== SCENE 1: HOOK & KINETIC TYPOGRAPHY */
+#S1 {
+  align-items: center;
+  justify-content: center;
+}
+.s1-phase {
+  position: absolute;
+  left: 0;
+  width: 1920px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+#s1-phase-1 { top: 380px; }
+#s1-phase-2 { top: 380px; }
+
+.s1-hero-line {
+  font-size: 130px;
+  line-height: 1;
+  letter-spacing: -0.045em;
+  white-space: nowrap;
+  text-align: center;
+}
+.s1-sub-line {
+  font-size: 38px;
+  color: var(--fg-dim);
+  margin-top: 28px;
+  text-align: center;
+}
+
+#s1-stutter-container {
+  position: absolute;
+  top: 450px;
+  left: 0;
+  width: 1920px;
+  text-align: center;
+  font-size: 155px;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.shock-ring {
+  position: absolute;
+  left: 960px;
+  top: 540px;
+  border-radius: 50%;
+  border: 2px solid var(--cyan);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+/* =================================================== SCENE 2: 3D TOPOLOGY & BEZIER PHYSICS */
+#S2 {
+  perspective: 1400px;
+}
+#s2-canvas {
+  position: absolute;
+  left: 260px;
+  top: 90px;
+  width: 1400px;
+  height: 900px;
+}
+#s2-hud-left {
+  position: absolute;
+  left: 90px;
+  top: 240px;
+  width: 440px;
+  z-index: 10;
+}
+#s2-hud-right {
+  position: absolute;
+  right: 90px;
+  top: 240px;
+  width: 460px;
+  z-index: 10;
+}
+
+.glass-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--card-border);
+  backdrop-filter: blur(24px);
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+}
+
+.graph-track {
+  position: relative;
+  height: 160px;
+  background: rgba(0, 0, 0, 0.45);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  margin-top: 16px;
+  overflow: hidden;
+}
+
+/* =================================================== SCENE 3: SPATIAL INTERACTION & BENTO CHOREOGRAPHY */
+#S3 {
+  perspective: 1600px;
+}
+#s3-bento {
+  position: absolute;
+  left: 180px;
+  top: 140px;
+  width: 1560px;
+  height: 800px;
+  transform-style: preserve-3d;
+}
+.bento-card {
+  position: absolute;
+  background: var(--bg-card);
+  border: 1px solid var(--card-border);
+  border-radius: 24px;
+  backdrop-filter: blur(26px);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  overflow: hidden;
+  padding: 32px;
+}
+#bento-hero {
+  left: 0;
+  top: 0;
+  width: 950px;
+  height: 490px;
+}
+#bento-side-1 {
+  left: 990px;
+  top: 0;
+  width: 570px;
+  height: 370px;
+}
+#bento-side-2 {
+  left: 990px;
+  top: 410px;
+  width: 570px;
+  height: 390px;
+}
+#bento-bot {
+  left: 0;
+  top: 530px;
+  width: 950px;
+  height: 270px;
+}
+
+/* Ripple click wave */
+#s3-click-ripple {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid var(--lime);
+  pointer-events: none;
+  transform: translate(-50%, -50%) scale(0);
+  opacity: 0;
+  z-index: 45;
+}
+
+/* Virtual cursor */
+#virtual-cursor {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  pointer-events: none;
+  z-index: 50;
+}
+
+/* =================================================== SCENE 4: HIGH-SPEED KINETIC SURGE */
+#S4 {
+  overflow: hidden;
+}
+.speed-strip {
+  position: absolute;
+  width: 2400px;
+  height: 180px;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+#strip-1 { top: 160px; transform: rotate(-3deg); }
+#strip-2 { top: 440px; transform: rotate(2.5deg); }
+#strip-3 { top: 720px; transform: rotate(-1.5deg); }
+
+.marquee-text {
+  font-family: "Syne", sans-serif;
+  font-size: 135px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  padding-right: 60px;
+}
+
+#s4-center-card {
+  position: absolute;
+  left: 460px;
+  top: 290px;
+  width: 1000px;
+  height: 500px;
+  background: #FFFFFF;
+  color: #07080D;
+  border-radius: 36px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 50px 120px rgba(0, 0, 0, 0.8);
+}
+
+/* =================================================== SCENE 5: FINALE RESUME LOCKUP & CTA */
+#S5 {
+  align-items: center;
+  justify-content: center;
+}
+#s5-logo-container {
+  position: absolute;
+  left: 0;
+  top: 170px;
+  width: 1920px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+#s5-emblem {
+  width: 120px;
+  height: 120px;
+  position: relative;
+  margin-bottom: 24px;
+}
+#s5-title {
+  font-family: "Syne", sans-serif;
+  font-size: 110px;
+  font-weight: 800;
+  letter-spacing: -0.045em;
+  line-height: 0.95;
+  text-align: center;
+}
+#s5-tagline {
+  font-size: 34px;
+  color: var(--fg-dim);
+  margin-top: 16px;
+  text-align: center;
+}
+#s5-cta-badge {
+  margin-top: 32px;
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 32px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(0, 240, 255, 0.45);
+  box-shadow: 0 0 50px rgba(0, 240, 255, 0.2);
+}
+
+#s5-competencies {
+  position: absolute;
+  bottom: 160px;
+  left: 0;
+  width: 1920px;
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+}
+.comp-pill {
+  padding: 8px 18px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  font-family: "Geist Mono", monospace;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  color: var(--cyan);
+}
+
+#s5-footer-cards {
+  position: absolute;
+  bottom: 75px;
+  left: 0;
+  width: 1920px;
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+}
+.footer-chip {
+  padding: 12px 26px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  font-family: "Geist Mono", monospace;
+  font-size: 13px;
+  letter-spacing: 0.15em;
+  color: var(--fg-dim);
+}
+
+/* Flash Whiteout Layer */
+#flash-layer {
+  position: absolute;
+  inset: 0;
+  background: #FFF;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 1000;
+}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="bg-ambient"></div>
+  <div id="bg-grid"></div>
+
+  <!-- Master Camera Container -->
+  <div id="world">
+
+    <!-- ======================================================== SCENE 1 -->
+    <div class="L" id="S1">
+      <div class="shock-ring" id="s1-ring"></div>
+
+      <!-- Phase 1: MOTION AS CODE -->
+      <div class="s1-phase" id="s1-phase-1">
+        <div class="syne s1-hero-line" id="s1-t1"></div>
+        <div class="serif-italic s1-sub-line" id="s1-sub-1"></div>
+      </div>
+
+      <!-- Phase 2: BUILT FOR IMPACT -->
+      <div class="s1-phase" id="s1-phase-2">
+        <div class="syne s1-hero-line" id="s1-t2"></div>
+        <div class="serif-italic s1-sub-line" id="s1-sub-2"></div>
+      </div>
+
+      <!-- Phase 3: Stutter Blast -->
+      <div class="syne" id="s1-stutter-container"></div>
+    </div>
+
+    <!-- ======================================================== SCENE 2 -->
+    <div class="L" id="S2">
+      <canvas id="s2-canvas" width="1400" height="900"></canvas>
+      <div id="s2-hud-left">
+        <div class="glass-panel" id="s2-panel-1">
+          <div class="mono" style="font-size:12px; color:var(--cyan); margin-bottom:8px;">// TOPOLOGY ENGINE</div>
+          <div style="font-size:24px; font-weight:700; margin-bottom:14px;">Spatial Geometry 3D</div>
+          <div class="mono" style="font-size:13px; color:var(--fg-dim); line-height:1.75;">
+            VERTICES: <span class="cyan">64 PURE TENSORS</span><br>
+            CHOREOGRAPHY: <span class="cyan">DETERMINISTIC</span><br>
+            DYNAMICS: <span class="lime">SPRING(280, 22)</span><br>
+            AXIS: <span style="color:#FFF;">PITCH · YAW · ROLL</span>
+          </div>
+        </div>
+      </div>
+      <div id="s2-hud-right">
+        <div class="glass-panel" id="s2-panel-2">
+          <div class="mono" style="font-size:12px; color:var(--lime); margin-bottom:8px;">// EASING CHOREOGRAPHY</div>
+          <div style="font-size:24px; font-weight:700;">cubic-bezier(0.16, 1, 0.3, 1)</div>
+          <div class="graph-track">
+            <svg id="s2-curve-svg" width="410" height="160" style="position:absolute; inset:0;"></svg>
+          </div>
+          <div class="mono" style="font-size:12px; color:var(--fg-muted); margin-top:12px; display:flex; justify-content:space-between;">
+            <span>v₀: 0.00</span>
+            <span class="cyan">PEAK ACCEL: +4.8G</span>
+            <span>t_settle: 0.38s</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================================================== SCENE 3 -->
+    <div class="L" id="S3">
+      <div id="s3-bento">
+        <!-- Hero Interactive Card -->
+        <div class="bento-card" id="bento-hero">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+            <div>
+              <div class="mono" style="font-size:12px; color:var(--cyan); margin-bottom:6px;">PROTOTYPE 04 // SPATIAL SCRUBBER</div>
+              <div style="font-size:32px; font-weight:800; letter-spacing:-0.02em;">Micro-Interaction Engine</div>
+            </div>
+            <div class="badge-pill">
+              <div class="badge-dot"></div>
+              <span class="mono" style="font-size:11px; color:#FFF;">60 FPS LOCKED</span>
+            </div>
+          </div>
+          
+          <!-- Audio Waveform / Scrubber Component -->
+          <div style="margin-top:40px; background:rgba(0,0,0,0.4); border-radius:16px; padding:24px; border:1px solid rgba(255,255,255,0.06); position:relative;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:12px;" class="mono">
+              <span style="font-size:13px; color:var(--fg-dim);">INTERPOLATION CURVE</span>
+              <span class="cyan" style="font-size:13px;" id="s3-scrub-val">0.742</span>
+            </div>
+            <!-- Dynamic wave bars -->
+            <div id="s3-wave-container" style="display:flex; align-items:center; gap:6px; height:80px; position:relative;"></div>
+            <!-- Playhead line -->
+            <div id="s3-playhead" style="position:absolute; top:20px; bottom:20px; width:2px; background:var(--cyan); box-shadow:0 0 12px var(--cyan);"></div>
+          </div>
+
+          <div style="display:flex; gap:16px; margin-top:28px;">
+            <div class="badge-pill" id="s3-pill-1" style="padding:10px 20px; font-weight:600; font-size:14px; background:rgba(0,240,255,0.12); border-color:rgba(0,240,255,0.3); color:var(--cyan);">
+              Elastic Damping
+            </div>
+            <div class="badge-pill" id="s3-pill-2" style="padding:10px 20px; font-weight:600; font-size:14px;">
+              Sub-pixel Snapping
+            </div>
+            <div class="badge-pill" id="s3-pill-3" style="padding:10px 20px; font-weight:600; font-size:14px;">
+              Velocity Matching
+            </div>
+          </div>
+        </div>
+
+        <!-- Side Bento 1: Multi-state Action -->
+        <div class="bento-card" id="bento-side-1">
+          <div class="mono" style="font-size:12px; color:var(--lime); margin-bottom:8px;">STATE CHOREOGRAPHY</div>
+          <div style="font-size:24px; font-weight:700;">Dynamic Transform</div>
+          <div style="margin-top:36px; display:flex; flex-direction:column; gap:16px;">
+            <div id="s3-btn-state" style="height:60px; border-radius:14px; background:var(--blue); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:16px; box-shadow:0 10px 30px rgba(37,99,235,0.4); position:relative; overflow:hidden;">
+              <span id="s3-btn-label">Deploy Animation</span>
+            </div>
+            <div style="display:flex; justify-content:space-between;" class="mono">
+              <span style="font-size:11px; color:var(--fg-muted);">TRANSITION</span>
+              <span class="lime" style="font-size:11px;">SPRING OVERSHOOT +12%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Side Bento 2: Telemetry Radar -->
+        <div class="bento-card" id="bento-side-2">
+          <div class="mono" style="font-size:12px; color:var(--cyan); margin-bottom:8px;">LATENCY & PERF</div>
+          <div style="font-size:24px; font-weight:700;">Zero Frame Drops</div>
+          <div style="margin-top:24px; display:flex; align-items:center; gap:24px;">
+            <div style="font-size:64px; font-weight:800; font-family:'Syne',sans-serif; color:var(--cyan);">
+              0.4<span style="font-size:24px; font-weight:600; color:var(--fg-dim);">ms</span>
+            </div>
+            <div class="mono" style="font-size:12px; color:var(--fg-dim); line-height:1.6;">
+              RENDER COST / FRAME<br>
+              GPU ACCELERATED<br>
+              <span class="lime">100% REPRODUCIBLE</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom Bento: Kinetic Bar -->
+        <div class="bento-card" id="bento-bot" style="display:flex; align-items:center; justify-content:space-between;">
+          <div>
+            <div class="mono" style="font-size:11px; color:var(--fg-muted);">PHILOSOPHY</div>
+            <div class="serif-italic" style="font-size:36px; color:#FFF; margin-top:4px;">"Every movement tells the brain what just happened."</div>
+          </div>
+          <div class="badge-pill" style="padding:12px 24px; background:rgba(255,255,255,0.06); font-size:14px;">
+            ✦ PRODUCT MOTION
+          </div>
+        </div>
+      </div>
+
+      <!-- Click ripple wave -->
+      <div id="s3-click-ripple"></div>
+
+      <!-- Virtual cursor -->
+      <div id="virtual-cursor">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+          <path d="M4 3L11 20L14 13L21 10L4 3Z" fill="#00F0FF" stroke="#000" stroke-width="1.5" stroke-linejoin="round"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- ======================================================== SCENE 4 -->
+    <div class="L" id="S4">
+      <div class="speed-strip" id="strip-1">
+        <div class="marquee-text" style="color:rgba(255,255,255,0.12);">KINETIC SYSTEMS · CODE-DRIVEN MOTION · 60 FPS · DYNAMIC CHOREOGRAPHY · </div>
+        <div class="marquee-text" style="color:rgba(255,255,255,0.12);">KINETIC SYSTEMS · CODE-DRIVEN MOTION · 60 FPS · DYNAMIC CHOREOGRAPHY · </div>
+      </div>
+      <div class="speed-strip" id="strip-2">
+        <div class="marquee-text" style="color:var(--cyan); opacity:0.25;">OBSESSED WITH TIMING · ZERO COMPROMISE · FLUIDITY · OBSESSED WITH TIMING · </div>
+        <div class="marquee-text" style="color:var(--cyan); opacity:0.25;">OBSESSED WITH TIMING · ZERO COMPROMISE · FLUIDITY · OBSESSED WITH TIMING · </div>
+      </div>
+      <div class="speed-strip" id="strip-3">
+        <div class="marquee-text" style="color:rgba(255,255,255,0.12);">SUB-FRAME BLUR · PROCEDURAL SFX · TOPOLOGY · SPATIAL AUDIO · </div>
+        <div class="marquee-text" style="color:rgba(255,255,255,0.12);">SUB-FRAME BLUR · PROCEDURAL SFX · TOPOLOGY · SPATIAL AUDIO · </div>
+      </div>
+
+      <div id="s4-center-card">
+        <div class="mono" style="font-size:14px; letter-spacing:0.2em; color:var(--blue); margin-bottom:12px;">MOTION REEL 2026</div>
+        <div class="syne" style="font-size:74px; font-weight:800; line-height:1; text-align:center;">
+          DESIGNED<br>FOR IMPACT.
+        </div>
+        <div class="serif-italic" style="font-size:28px; color:#555; margin-top:14px;">
+          Fast. Dramatic. Unforgettable.
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================================================== SCENE 5 -->
+    <div class="L" id="S5">
+      <div id="s5-logo-container">
+        <!-- Sleek Kinetic Emblem -->
+        <div id="s5-emblem">
+          <svg width="120" height="120" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="44" stroke="rgba(255,255,255,0.15)" stroke-width="2" fill="none"/>
+            <circle id="s5-ring-spin" cx="50" cy="50" r="44" stroke="var(--cyan)" stroke-width="2.5" stroke-dasharray="70 200" fill="none"/>
+            <polygon points="50,22 76,70 24,70" stroke="#FFF" stroke-width="2.5" fill="none" stroke-linejoin="round"/>
+            <circle cx="50" cy="50" r="6" fill="var(--cyan)"/>
+          </svg>
+        </div>
+
+        <div id="s5-title">ANTIGRAVITY</div>
+        <div class="serif-italic" id="s5-tagline">Senior Motion Designer & Creative Technologist</div>
+
+        <div id="s5-cta-badge">
+          <div class="badge-dot"></div>
+          <span class="mono" style="font-size:13px; font-weight:600; color:#FFF; letter-spacing:0.18em;">
+            AVAILABLE FOR CONTRACT & FULL-TIME · 2026
+          </span>
+        </div>
+      </div>
+
+      <div id="s5-competencies">
+        <div class="comp-pill">AFTER EFFECTS + CODE</div>
+        <div class="comp-pill">DESIGN SYSTEMS</div>
+        <div class="comp-pill">3D TOPOLOGY</div>
+        <div class="comp-pill">PROCEDURAL SOUND</div>
+        <div class="comp-pill">60 FPS DETERMINISTIC</div>
+      </div>
+
+      <div id="s5-footer-cards">
+        <div class="footer-chip">✦ PORTFOLIO: MOTION-BY-LABS.DEV</div>
+        <div class="footer-chip">✦ LOCATION: JAKARTA / REMOTE</div>
+        <div class="footer-chip">✦ SHOWREEL REEL.26</div>
+      </div>
+    </div>
+
+  </div> <!-- /world -->
+
+  <!-- Global Studio HUD overlay -->
+  <div id="studio-overlay">
+    <div class="crop-corner crop-tl"></div>
+    <div class="crop-corner crop-tr"></div>
+    <div class="crop-corner crop-bl"></div>
+    <div class="crop-corner crop-br"></div>
+
+    <div class="telemetry-badge" id="tc-top-left">
+      <span class="badge-pill">
+        <span class="badge-dot"></span>
+        <span>REC · 60 FPS</span>
+      </span>
+    </div>
+    <div class="telemetry-badge" id="tc-top-right">
+      <span id="tc-timecode">00:00:00:00</span>
+    </div>
+    <div class="telemetry-badge" id="tc-bot-left">
+      <span>ANTIGRAVITY // SHOWREEL REEL.26</span>
+    </div>
+    <div class="telemetry-badge" id="tc-bot-right">
+      <span id="tc-frame">F: 000 / 900</span>
+    </div>
+  </div>
+
+  <div id="scanlines"></div>
+  <div id="flash-layer"></div>
+</div>
+
+<script type="module">
+const DURATION = 15.0;
+const $ = id => document.getElementById(id);
+
+// ------------------------------------------------------------- Math & Easing Helpers
+const cl = x => Math.max(0, Math.min(1, x));
+const seg = (t, a, b) => cl((t - a) / (b - a));
+const mix = (a, b, p) => a + (b - a) * p;
+const ex = p => p >= 1 ? 1 : 1 - Math.pow(2, -10 * p);
+const exin = p => p <= 0 ? 0 : Math.pow(2, 10 * p - 10);
+const exio = p => p <= 0 ? 0 : p >= 1 ? 1 : p < 0.5 ? Math.pow(2, 20 * p - 10) / 2 : (2 - Math.pow(2, -20 * p + 10)) / 2;
+const spring = (p, w = 11, d = 6) => p <= 0 ? 0 : p >= 1 ? 1 : 1 - Math.exp(-d * p) * Math.cos(w * p);
+
+const show = (id, on) => { 
+  const e = $(id); 
+  const d = on ? "flex" : "none"; 
+  if (e.style.display !== d) e.style.display = d; 
+  return on; 
+};
+const Lay = (id, a, b, t) => show(id, t >= a && t < b);
+
+// Typography reveal helper
+function words(el, text) {
+  el.innerHTML = text.split(" ").map(w => {
+    if (w.startsWith("*")) return `<span class="w cyan cyan-glow">${w.slice(1)}</span>`;
+    if (w.startsWith("^")) return `<span class="w lime lime-glow">${w.slice(1)}</span>`;
+    return `<span class="w">${w}</span>`;
+  }).join("");
+  return [...el.children];
+}
+
+function reveal(ws, t, t0, step = 0.06, out = 1e9, yDist = 45) {
+  const o = ex(seg(t, out, out + 0.28));
+  ws.forEach((w, i) => {
+    const k = ex(seg(t, t0 + i * step, t0 + i * step + 0.40));
+    w.style.opacity = cl(k * 1.5) * (1 - o);
+    w.style.transform = `translateY(${(1 - k) * yDist - o * 35}px) scale(${mix(0.88, 1, k)})`;
+    w.style.filter = `blur(${(1 - k) * 12 + o * 16}px)`;
+  });
+}
+
+// Camera Punches: [time, intensity]
+const PUNCH = [
+  [0.0, 0.05],
+  [1.35, 0.045],
+  [2.10, 0.035],
+  [3.00, 0.06],
+  [4.60, 0.03],
+  [6.20, 0.05],
+  [7.15, 0.045],
+  [9.40, 0.06],
+  [10.80, 0.04],
+  [12.50, 0.08]
+];
+
+function cam(t) {
+  let s = 1.0, x = 0, y = 0, rot = 0;
+  // Slow continuous ambient camera push-in
+  s += 0.02 * Math.sin(t * 0.5);
+
+  PUNCH.forEach(([p, a], j) => {
+    if (t < p) return;
+    const d = t - p;
+    s += a * Math.exp(-d * 8);
+    x += Math.sin(d * 60 + j) * 16 * (a / 0.04) * Math.exp(-d * 10);
+    y += Math.cos(d * 52 + j * 2) * 12 * (a / 0.04) * Math.exp(-d * 10);
+    rot += Math.sin(d * 40 + j) * 1.2 * (a / 0.04) * Math.exp(-d * 11);
+  });
+  return { s, x, y, rot };
+}
+
+// ------------------------------------------------------------- Wave bars builder
+const waveContainer = $("s3-wave-container");
+const waveBars = [];
+const NUM_BARS = 38;
+for (let i = 0; i < NUM_BARS; i++) {
+  const bar = document.createElement("div");
+  bar.style.flex = "1";
+  bar.style.background = "rgba(255,255,255,0.18)";
+  bar.style.borderRadius = "3px";
+  bar.style.height = "20px";
+  bar.style.transformOrigin = "bottom center";
+  waveContainer.appendChild(bar);
+  waveBars.push(bar);
+}
+
+// ------------------------------------------------------------- Scene 2: 3D Topology Wireframe Canvas Setup
+const s2Canvas = $("s2-canvas");
+const ctx2 = s2Canvas.getContext("2d");
+
+// Precompute 3D Polyhedron (Expanded Icosahedron vertices)
+const PHI = (1 + Math.sqrt(5)) / 2;
+const BASE_VERTICES = [
+  [-1,  PHI, 0], [ 1,  PHI, 0], [-1, -PHI, 0], [ 1, -PHI, 0],
+  [0, -1,  PHI], [0,  1,  PHI], [0, -1, -PHI], [0,  1, -PHI],
+  [ PHI, 0, -1], [ PHI, 0,  1], [-PHI, 0, -1], [-PHI, 0,  1]
+].map(v => {
+  const len = Math.hypot(v[0], v[1], v[2]);
+  return [v[0] / len * 260, v[1] / len * 260, v[2] / len * 260];
+});
+
+// Inner concentric sphere vertices
+const INNER_VERTICES = BASE_VERTICES.map(v => [v[0] * 0.52, v[1] * 0.52, v[2] * 0.52]);
+
+// Coordinate Ring points for 3 axes (pitch, yaw, roll)
+function createRingPoints(radius, segments = 32, axis = 'y') {
+  const pts = [];
+  for (let i = 0; i < segments; i++) {
+    const angle = (i / segments) * Math.PI * 2;
+    if (axis === 'y') pts.push([Math.cos(angle) * radius, 0, Math.sin(angle) * radius]);
+    else if (axis === 'x') pts.push([0, Math.cos(angle) * radius, Math.sin(angle) * radius]);
+    else pts.push([Math.cos(angle) * radius, Math.sin(angle) * radius, 0]);
+  }
+  return pts;
+}
+const RING_Y = createRingPoints(300, 32, 'y');
+const RING_X = createRingPoints(300, 32, 'x');
+
+// Precompute Bézier SVG path
+const bezierSvg = $("s2-curve-svg");
+function updateBezierSvg(t) {
+  const p = seg(t, 3.2, 5.8);
+  const hx = mix(50, 160, spring(p));
+  const hy = mix(140, 30, spring(p));
+  bezierSvg.innerHTML = `
+    <!-- Grid -->
+    <line x1="40" y1="130" x2="370" y2="130" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+    <line x1="40" y1="30" x2="370" y2="30" stroke="rgba(255,255,255,0.1)" stroke-width="1" stroke-dasharray="4 4"/>
+    <!-- Handles -->
+    <line x1="40" y1="130" x2="${hx}" y2="${hy}" stroke="rgba(0,240,255,0.5)" stroke-width="2"/>
+    <circle cx="${hx}" cy="${hy}" r="5" fill="#00F0FF" />
+    <line x1="370" y1="30" x2="300" y2="30" stroke="rgba(212,231,81,0.5)" stroke-width="2"/>
+    <circle cx="300" cy="30" r="5" fill="#D4E751" />
+    <!-- Curve -->
+    <path d="M 40 130 C ${hx} ${hy}, 300 30, 370 30" fill="none" stroke="url(#c-grad)" stroke-width="3.5"/>
+    <defs>
+      <linearGradient id="c-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#00F0FF"/>
+        <stop offset="100%" stop-color="#D4E751"/>
+      </linearGradient>
+    </defs>
+  `;
+}
+
+// ------------------------------------------------------------- Pre-create Text Nodes
+let W1_1, W1_sub1, W1_2, W1_sub2;
+
+// ------------------------------------------------------------- Master Render Loop
+function renderAt(t) {
+  // Update Studio Telemetry
+  const frameNum = Math.floor(t * 60);
+  $("tc-frame").textContent = `F: ${String(frameNum).padStart(3, "0")} / 900`;
+  
+  const sec = Math.floor(t);
+  const ms = Math.floor((t % 1) * 60);
+  $("tc-timecode").textContent = `00:00:${String(sec).padStart(2, "0")}:${String(ms).padStart(2, "0")}`;
+
+  // =========================================================== SCENE 1 (0.0s - 3.2s)
+  if (Lay("S1", 0.0, 3.2, t)) {
+    // Phase 1 (0.0s - 1.35s): "MOTION AS CODE."
+    const p1Out = t >= 1.25 ? 1.25 : 1e9;
+    reveal(W1_1, t, 0.15, 0.07, p1Out, 45);
+    reveal(W1_sub1, t, 0.35, 0.05, p1Out, 25);
+    show("s1-phase-1", t < 1.35);
+
+    // Phase 2 (1.35s - 2.1s): "BUILT FOR IMPACT."
+    const p2Out = t >= 2.05 ? 2.05 : 1e9;
+    show("s1-phase-2", t >= 1.30 && t < 2.15);
+    if (t >= 1.30) {
+      reveal(W1_2, t, 1.35, 0.07, p2Out, 45);
+      reveal(W1_sub2, t, 1.55, 0.05, p2Out, 25);
+    }
+
+    // Shock ring pulse at 0.0s and 1.35s
+    const ring1 = ex(seg(t, 0.0, 0.7));
+    const ring2 = ex(seg(t, 1.35, 1.95));
+    const rScale = ring1 < 1 ? mix(0.1, 2.8, ring1) : mix(0.1, 2.5, ring2);
+    const rAlpha = ring1 < 1 ? (1 - ring1) * 0.8 : (1 - ring2) * 0.7;
+    $("s1-ring").style.transform = `translate(-50%, -50%) scale(${rScale})`;
+    $("s1-ring").style.opacity = rAlpha;
+
+    // Phase 3 (2.1s - 2.8s): Stutter cascade
+    if (t >= 2.05 && t < 2.85) {
+      const idx = Math.floor((t - 2.05) / 0.25);
+      const stutterWords = ["PRECISION", "CHOREOGRAPHY", "OBSESSION"];
+      const currentWord = stutterWords[Math.min(stutterWords.length - 1, idx)];
+      $("s1-stutter-container").textContent = currentWord;
+      const subProg = seg(t, 2.05 + idx * 0.25, 2.05 + (idx + 1) * 0.25);
+      $("s1-stutter-container").style.transform = `scale(${mix(1.22, 1.0, ex(subProg))})`;
+      $("s1-stutter-container").style.opacity = cl(subProg * 2) * (1 - subProg * 0.4);
+      $("s1-stutter-container").style.color = idx === 1 ? "var(--cyan)" : idx === 2 ? "var(--lime)" : "#FFF";
+    } else {
+      $("s1-stutter-container").textContent = "";
+    }
+
+    // Morph shrink exit at 2.8s -> suction into center point
+    if (t >= 2.8) {
+      const p = exin(seg(t, 2.8, 3.1));
+      $("S1").style.transform = `scale(${mix(1, 0.05, p)}) rotate(${p * 15}deg)`;
+      $("S1").style.opacity = 1 - p;
+    } else {
+      $("S1").style.transform = "none";
+      $("S1").style.opacity = 1;
+    }
+  }
+
+  // =========================================================== SCENE 2 (3.0s - 6.4s)
+  if (Lay("S2", 3.0, 6.4, t)) {
+    const s2Enter = spring(seg(t, 3.0, 3.6));
+    const s2Exit = exin(seg(t, 6.0, 6.35));
+
+    // Panels slide & spring in
+    $("s2-panel-1").style.transform = `translateX(${(1 - s2Enter) * -220 - s2Exit * 420}px)`;
+    $("s2-panel-1").style.opacity = s2Enter * (1 - s2Exit);
+
+    $("s2-panel-2").style.transform = `translateX(${(1 - s2Enter) * 220 + s2Exit * 420}px)`;
+    $("s2-panel-2").style.opacity = s2Enter * (1 - s2Exit);
+
+    updateBezierSvg(t);
+
+    // 3D Canvas Rendering
+    ctx2.clearRect(0, 0, 1400, 900);
+    const cx = 700, cy = 450;
+
+    // Rotation angles
+    const rotSpeed = t * 1.35;
+    const ax = rotSpeed * 0.75;
+    const ay = rotSpeed * 1.05;
+    const az = rotSpeed * 0.45;
+
+    // 3D Projection helper
+    function project(v, scale = 1.0) {
+      let x = v[0] * scale, y = v[1] * scale, z = v[2] * scale;
+      // Rot X
+      let y1 = y * Math.cos(ax) - z * Math.sin(ax);
+      let z1 = y * Math.sin(ax) + z * Math.cos(ax);
+      // Rot Y
+      let x2 = x * Math.cos(ay) + z1 * Math.sin(ay);
+      let z2 = -x * Math.sin(ay) + z1 * Math.cos(ay);
+      // Rot Z
+      let x3 = x2 * Math.cos(az) - y1 * Math.sin(az);
+      let y3 = x2 * Math.sin(az) + y1 * Math.cos(az);
+      // Perspective
+      const fov = 500;
+      const zoom = fov / (fov + z2 + 320);
+      return {
+        px: cx + x3 * zoom,
+        py: cy + y3 * zoom,
+        z: z2,
+        zoom
+      };
+    }
+
+    const grow = mix(0.1, 1.0, s2Enter) * (1 - s2Exit * 0.9);
+    const projectedOuter = BASE_VERTICES.map(v => project(v, grow));
+    const projectedInner = INNER_VERTICES.map(v => project(v, grow));
+    const projRingY = RING_Y.map(v => project(v, grow));
+    const projRingX = RING_X.map(v => project(v, grow));
+
+    // Draw coordinate rings
+    function drawRing(pts, strokeStyle) {
+      ctx2.strokeStyle = strokeStyle;
+      ctx2.lineWidth = 1;
+      ctx2.beginPath();
+      for (let i = 0; i < pts.length; i++) {
+        const next = pts[(i + 1) % pts.length];
+        ctx2.moveTo(pts[i].px, pts[i].py);
+        ctx2.lineTo(next.px, next.py);
+      }
+      ctx2.stroke();
+    }
+    drawRing(projRingY, "rgba(0, 240, 255, 0.22)");
+    drawRing(projRingX, "rgba(212, 231, 81, 0.18)");
+
+    // Draw connecting edges
+    ctx2.lineWidth = 2.0;
+    for (let i = 0; i < projectedOuter.length; i++) {
+      for (let j = i + 1; j < projectedOuter.length; j++) {
+        const dx = BASE_VERTICES[i][0] - BASE_VERTICES[j][0];
+        const dy = BASE_VERTICES[i][1] - BASE_VERTICES[j][1];
+        const dz = BASE_VERTICES[i][2] - BASE_VERTICES[j][2];
+        const dist = Math.hypot(dx, dy, dz);
+        if (dist < 320) {
+          const p1 = projectedOuter[i], p2 = projectedOuter[j];
+          const edgeAlpha = cl(mix(0.12, 0.55, (p1.z + p2.z + 500) / 1000));
+          ctx2.strokeStyle = `rgba(0, 240, 255, ${edgeAlpha})`;
+          ctx2.beginPath();
+          ctx2.moveTo(p1.px, p1.py);
+          ctx2.lineTo(p2.px, p2.py);
+          ctx2.stroke();
+        }
+      }
+    }
+
+    // Draw inner cage
+    ctx2.strokeStyle = "rgba(212, 231, 81, 0.4)";
+    ctx2.lineWidth = 1.5;
+    for (let i = 0; i < projectedInner.length; i++) {
+      const p1 = projectedInner[i];
+      const p2 = projectedOuter[i];
+      ctx2.beginPath();
+      ctx2.moveTo(p1.px, p1.py);
+      ctx2.lineTo(p2.px, p2.py);
+      ctx2.stroke();
+    }
+
+    // Draw Glowing Vertices with micro coordinate tags
+    ctx2.font = "10px 'Geist Mono', monospace";
+    projectedOuter.forEach((p, idx) => {
+      const radius = Math.max(1.5, 6.0 * p.zoom);
+      ctx2.fillStyle = idx % 2 === 0 ? "#00F0FF" : "#D4E751";
+      ctx2.beginPath();
+      ctx2.arc(p.px, p.py, radius, 0, Math.PI * 2);
+      ctx2.fill();
+
+      // Subtle vertex labels for key nodes
+      if (idx % 3 === 0 && p.z > -100) {
+        ctx2.fillStyle = "rgba(255, 255, 255, 0.5)";
+        ctx2.fillText(`P_${String(idx).padStart(2, "0")}`, p.px + 10, p.py - 6);
+      }
+    });
+  }
+
+  // =========================================================== SCENE 3 (6.2s - 9.6s)
+  if (Lay("S3", 6.2, 9.6, t)) {
+    const s3Enter = spring(seg(t, 6.2, 6.9));
+    const s3Exit = exin(seg(t, 9.2, 9.55));
+
+    // Bento 3D Tilt perspective
+    const tiltProg = seg(t, 6.8, 8.4);
+    const rotX = mix(0, 18, spring(tiltProg));
+    const rotY = mix(0, -12, spring(tiltProg));
+    const transZ = mix(-400, 0, s3Enter) - s3Exit * 600;
+
+    $("s3-bento").style.transform = `translateZ(${transZ}px) rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+    $("s3-bento").style.opacity = s3Enter * (1 - s3Exit);
+
+    // Audio Waveform dynamic height calculation
+    const scrubT = seg(t, 6.4, 8.8);
+    $("s3-scrub-val").textContent = scrubT.toFixed(3);
+    const playheadX = mix(10, 890, ex(scrubT));
+    $("s3-playhead").style.left = `${playheadX}px`;
+
+    waveBars.forEach((bar, idx) => {
+      const norm = idx / NUM_BARS;
+      const wave = Math.sin(norm * 14 + t * 8) * 0.5 + 0.5;
+      const isPast = norm <= scrubT;
+      bar.style.height = `${mix(15, 65, wave)}px`;
+      bar.style.background = isPast ? "var(--cyan)" : "rgba(255,255,255,0.14)";
+      bar.style.boxShadow = isPast ? "0 0 8px rgba(0,240,255,0.5)" : "none";
+    });
+
+    // Simulated Cursor Action (Clicks button at 7.15s)
+    const curP1 = seg(t, 6.5, 7.15);
+    const curX = mix(1400, 1220, ex(curP1));
+    const curY = mix(700, 310, ex(curP1));
+    $("virtual-cursor").style.left = `${curX}px`;
+    $("virtual-cursor").style.top = `${curY}px`;
+
+    // Button click trigger & ripple at 7.15s
+    if (t >= 7.15) {
+      const clickBounce = spring(seg(t, 7.15, 7.6));
+      $("s3-btn-state").style.transform = `scale(${mix(0.92, 1.0, clickBounce)})`;
+      $("s3-btn-state").style.background = "var(--lime)";
+      $("s3-btn-label").textContent = "✓ 60 FPS COMPILED";
+      $("s3-btn-label").style.color = "#07080D";
+
+      // Expanding ripple
+      const ripProg = seg(t, 7.15, 7.8);
+      $("s3-click-ripple").style.left = `1220px`;
+      $("s3-click-ripple").style.top = `310px`;
+      $("s3-click-ripple").style.transform = `translate(-50%, -50%) scale(${mix(0.2, 14, ex(ripProg))})`;
+      $("s3-click-ripple").style.opacity = (1 - ripProg) * 0.8;
+    } else {
+      $("s3-btn-state").style.transform = "none";
+      $("s3-btn-state").style.background = "var(--blue)";
+      $("s3-btn-label").textContent = "Deploy Animation";
+      $("s3-btn-label").style.color = "#FFF";
+      $("s3-click-ripple").style.opacity = 0;
+    }
+  }
+
+  // =========================================================== SCENE 4 (9.4s - 12.6s)
+  if (Lay("S4", 9.4, 12.6, t)) {
+    const s4Enter = spring(seg(t, 9.4, 9.9));
+    const s4Exit = exin(seg(t, 12.2, 12.55));
+
+    // Marquee strips speed move
+    const speed = (t - 9.4) * 900;
+    $("strip-1").style.transform = `rotate(-3deg) translateX(${-speed}px)`;
+    $("strip-2").style.transform = `rotate(2.5deg) translateX(${speed * 1.3 - 900}px)`;
+    $("strip-3").style.transform = `rotate(-1.5deg) translateX(${-speed * 0.9}px)`;
+
+    // Center card slam
+    const cardScale = mix(2.2, 1.0, s4Enter) * (1 + s4Exit * 1.5);
+    const cardOpacity = s4Enter * (1 - s4Exit);
+    $("s4-center-card").style.transform = `scale(${cardScale}) rotate(${mix(-8, 0, s4Enter)}deg)`;
+    $("s4-center-card").style.opacity = cardOpacity;
+  }
+
+  // =========================================================== SCENE 5 (12.4s - 15.0s)
+  if (Lay("S5", 12.4, 15.0, t)) {
+    const s5Enter = spring(seg(t, 12.5, 13.3), 10, 5);
+    
+    // Grand logo reveal
+    $("s5-emblem").style.transform = `scale(${s5Enter}) rotate(${mix(180, 0, s5Enter)}deg)`;
+    $("s5-ring-spin").setAttribute("transform", `rotate(${(t - 12.5) * 120} 50 50)`);
+
+    $("s5-title").style.transform = `translateY(${(1 - s5Enter) * 55}px) scale(${mix(0.88, 1, s5Enter)})`;
+    $("s5-title").style.opacity = s5Enter;
+
+    $("s5-tagline").style.opacity = seg(t, 12.8, 13.4);
+    $("s5-tagline").style.transform = `translateY(${(1 - seg(t, 12.8, 13.4)) * 25}px)`;
+
+    const ctaProg = spring(seg(t, 13.1, 13.8));
+    $("s5-cta-badge").style.transform = `scale(${ctaProg})`;
+    $("s5-cta-badge").style.opacity = ctaProg;
+
+    const compProg = seg(t, 13.3, 13.9);
+    $("s5-competencies").style.opacity = compProg;
+    $("s5-competencies").style.transform = `translateY(${(1 - compProg) * 20}px)`;
+
+    const chipsProg = seg(t, 13.5, 14.1);
+    $("s5-footer-cards").style.opacity = chipsProg;
+    $("s5-footer-cards").style.transform = `translateY(${(1 - chipsProg) * 25}px)`;
+  }
+
+  // Whiteout Flash at key transitions (0.0s, 3.0s, 6.2s, 9.4s, 12.5s)
+  let flashA = 0;
+  [0.0, 3.0, 6.2, 9.4, 12.5].forEach(hit => {
+    if (t >= hit && t < hit + 0.35) {
+      const f = 1 - (t - hit) / 0.35;
+      flashA = Math.max(flashA, f * (hit === 12.5 ? 0.9 : 0.6));
+    }
+  });
+  $("flash-layer").style.opacity = flashA;
+
+  // Master Camera Punch & Dynamic Shake
+  const c = cam(t);
+  $("world").style.transform = `translate(${c.x}px, ${c.y}px) scale(${c.s}) rotate(${c.rot}deg)`;
+}
+
+// ------------------------------------------------------------- Ready & Fonts Initializer
+window.DURATION = DURATION;
+window.renderAt = renderAt;
+window.reelReady = (async () => {
+  await Promise.all([
+    document.fonts.load('800 100px "Syne"'),
+    document.fonts.load('700 40px "Geist"'),
+    document.fonts.load('500 14px "Geist Mono"'),
+    document.fonts.load('italic 36px "Instrument Serif"')
+  ]);
+  await document.fonts.ready;
+
+  // Prepare kinetic text tokens
+  W1_1 = words($("s1-t1"), "MOTION AS *CODE.");
+  W1_sub1 = words($("s1-sub-1"), "Senior Motion Designer & Creative Technologist");
+
+  W1_2 = words($("s1-t2"), "BUILT FOR ^IMPACT.");
+  W1_sub2 = words($("s1-sub-2"), "Every frame calculated. Every curve tuned.");
+
+  renderAt(0);
+  return true;
+})();
+
+// Real-time loop preview when opened in browser directly without ?capture
+if (!location.search.includes("capture")) {
+  await window.reelReady;
+  const t0 = performance.now();
+  const loop = () => {
+    const elapsed = ((performance.now() - t0) / 1000) % DURATION;
+    renderAt(elapsed);
+    requestAnimationFrame(loop);
+  };
+  loop();
+}
+</script>
+</body>
+</html>

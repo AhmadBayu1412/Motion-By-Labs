@@ -26,6 +26,7 @@ const ROOT = path.resolve(args.root || process.cwd()), OUT = path.join(ROOT, "ou
 const FPS = +(args.fps || 60), SUB = +(args.sub || 3), SHUTTER = +(args.shutter || 0.5), CRF = String(args.crf || 18);
 const WORKERS = +(args.workers || Math.max(1, Math.min(4, os.cpus().length)));
 const FFMPEG = process.env.FFMPEG || "ffmpeg";
+const PYTHON = process.env.PYTHON || (process.platform === "win32" ? "python" : "python3");
 const PAGE = args.page || "index.html", W = +(args.width || 1920), H = +(args.height || 1080);
 const NAME = args.name || path.basename(PAGE, ".html");
 if (!fs.existsSync(path.join(ROOT, PAGE))) { console.error(`page not found: ${path.join(ROOT, PAGE)} (use --root)`); process.exit(1); }
@@ -95,7 +96,7 @@ if (args.stills) {
   const mp4 = path.join(OUT, `${NAME}.mp4`);
   const wav = path.join(OUT, `${NAME}.wav`);
   // regenerate every time so the audio never goes stale after a retime (stdlib synthesis takes seconds)
-  if (args.sound && !args.noaudio) spawnSync("python3", [path.resolve(ROOT, args.sound), wav], { stdio: "inherit", cwd: ROOT });
+  if (args.sound && !args.noaudio) spawnSync(PYTHON, [path.resolve(ROOT, args.sound), wav], { stdio: "inherit", cwd: ROOT });
   const audio = !args.noaudio && fs.existsSync(wav) ? ["-i", wav, "-c:a", "aac", "-b:a", "256k", "-shortest"] : [];
   const r = spawnSync(FFMPEG, ["-y", "-loglevel", "error", "-framerate", String(FPS * SUB), "-i", path.join(tmp, "f%06d.jpg"), ...audio.slice(0, 2),
     "-vf", `${blur}format=yuv420p`, "-r", String(FPS), "-c:v", "libx264", "-preset", "slow", "-crf", CRF,

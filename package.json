@@ -1,0 +1,24 @@
+{
+  "name": "motion-by-labs",
+  "version": "1.0.0",
+  "description": "Skill Claude untuk membuat video motion graphics dari kode. Hasilnya brand reel, video promosi/explainer, logo reveal, kinetic typography, isometric 3D, pixel brand film, HUD sensor AI di atas footage (hand tracking asli), sampai edit absurd bertema kode.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thoriqalqi/Motion-By-Labs.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/thoriqalqi/Motion-By-Labs/issues"
+  },
+  "homepage": "https://github.com/thoriqalqi/Motion-By-Labs#readme",
+  "dependencies": {
+    "playwright": "^1.64.1"
+  }
+}
